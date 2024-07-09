@@ -182,12 +182,6 @@ print(loaded_model_0.state_dict())
 loaded_model_0.eval()
 with torch.inference_mode():
     loaded_model_preds = loaded_model_0(X_test)
-print(loaded_model_preds)
-# %%
-model_0.eval()
-with torch.inference_mode():
-    y_preds = model_0(X_test)
-print(y_preds)
-#%%
-y_preds == loaded_model_preds
+
+plot_predictions(predictions=loaded_model_preds)
 # %%
