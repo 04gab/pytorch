@@ -90,7 +90,7 @@ plot_predictions(predictions=y_preds)
 #an eoich is on loop through the data (hpyerparameter)
 #%%
 torch.manual_seed(42)
-epochs = 300
+epochs = 200
 #track values
 epoch_count = []
 loss_values = []
