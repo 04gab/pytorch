@@ -47,7 +47,6 @@ def plot_predictions(train_data = X_train,
 #%%
 plot_predictions()
 
-
 # %%
 #build linear regression model
 class LinearRegressionModel(nn.Module):
@@ -74,15 +73,10 @@ print(list(model_0.parameters()))
 #check out our model's parameters (a parameter is a value that the model sets itself)
 print(model_0.state_dict())
 
-#%%
-y_preds = model_0(X_test)
-print(y_preds)
 # %%
 with torch.inference_mode():
     y_preds = model_0(X_test)
 print(y_preds)
-#%%
-plot_predictions(predictions=y_preds)
 
 # %%
 #loss function
@@ -91,11 +85,12 @@ loss_fn = nn.L1Loss()
 #optimizer (stochastic gradient descent)
 optimizer = torch.optim.SGD(params=model_0.parameters(), 
                             lr=0.01) #lr = learning rate (most important hpyerparameter you can set)
-
+#%%
+plot_predictions(predictions=y_preds)
 #an eoich is on loop through the data (hpyerparameter)
 #%%
 torch.manual_seed(42)
-epochs = 200
+epochs = 300
 #track values
 epoch_count = []
 loss_values = []
@@ -134,7 +129,7 @@ for epoch in range(epochs):
         loss_values.append(loss)
         test_loss_values.append(test_loss)
         print(f"Epoch: {epoch} | Loss: {loss} | Test Loss: {test_loss}")
-        print(model_0.state_dict())
+        print(f"Epoch: {epoch} {model_0.state_dict()}")
 #%%
 plt.plot(epoch_count, np.array(torch.tensor(loss_values).numpy()), label = "Train loss")
 plt.plot(epoch_count, test_loss_values, label = "Test loss")
@@ -145,12 +140,8 @@ plt.legend()
 #%%
 with torch.inference_mode():
     y_preds_new = model_0(X_test)
-print(model_0.state_dict())
+print(f"Latest state dict: {model_0.state_dict()}")
 
-#%%
-print(weight, bias)
-#%%
-plot_predictions(predictions=y_preds)
 #%%
 plot_predictions(predictions=y_preds_new)
 
@@ -175,13 +166,11 @@ loaded_model_0 = LinearRegressionModel()
 
 #load the saved sate dict of model_0 (this will update the new instance with updated parameters)
 loaded_model_0.load_state_dict(torch.load(f=MODEL_SAVE_PATH))
-print(loaded_model_0.state_dict())
+print(f"Loaded model: {loaded_model_0.state_dict()}")
 
 #%%
 #make some predictions with our loaded model
 loaded_model_0.eval()
 with torch.inference_mode():
     loaded_model_preds = loaded_model_0(X_test)
-
-plot_predictions(predictions=loaded_model_preds)
 # %%
