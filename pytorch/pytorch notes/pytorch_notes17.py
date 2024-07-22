@@ -6,6 +6,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 from sklearn.model_selection import train_test_split
+import requests
+from pathlib import Path
+from helper_functions import plot_predictions, plot_decision_boundary
 print(torch.__version__)
 # multiclassification
 # ----------------------------------------------------------------------------------------------------------
@@ -13,7 +16,7 @@ print(torch.__version__)
 NUM_CLASSES = 4
 NUM_FEATURES = 2
 RANDOM_SEED = 42
-device = "cuda" if torch.cuda.is_available() else "cpu"
+
 
 X_blob, y_blob = make_blobs(n_samples=1000,
                             n_features=NUM_FEATURES,
@@ -28,13 +31,12 @@ X_blob_train, X_blob_test, y_blob_train, y_blob_test = train_test_split(X_blob,
                                                                         y_blob,
                                                                         test_size=0.2,
                                                                         random_state=RANDOM_SEED)
-#%%
-
-#%%
 #plot data
 plt.figure(figsize=(10, 7))
 plt.scatter(X_blob[:, 0], X_blob[:, 1], c=y_blob, cmap=plt.cm.RdYlBu)
-
+#%%
+device = "cuda" if torch.cuda.is_available() else "cpu"
+device
 # %%
 class BlobModel(nn.Module):
   def __init__(self, input_features, output_features, hidden_units=8):
@@ -49,23 +51,26 @@ class BlobModel(nn.Module):
 
   def forward(self, x):
     return self.linear_layer_stack(x)
-#%%
+
 model_4 = BlobModel(input_features=2,
                     output_features=4,
                     hidden_units=8).to(device)
 
+model_4
 # %%
 loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(params=model_4.parameters(),
                             lr=0.1)
-#%%
-X_blob_test.to(device)
-model_4.state_dict()
+
 #%%
 model_4.eval()
-with torch.inference_mode():
-  y_logits = model_4(X_blob_test)
 
+X_blob_test.to(device)
+model_4.state_dict()
+with torch.inference_mode():
+  y_logits = model_4(X_blob_test.to(device))
+
+y_logits[:10]
 # %%
 def accuracy_fn(y_true, y_pred):
     correct = torch.eq(y_true, y_pred).sum().item()
@@ -124,4 +129,21 @@ for epoch in range(epochs):
   
   if epoch % 10 == 0:
     print(f"Epoch: {epoch} | Loss: {loss:.4f}, Acc: {acc:.2f}% | Test loss: {test_loss:.4f}, Test acc: {test_acc:.2f}%")
+# %%
+model_4.eval()
+with torch.inference_mode():
+  y_logits = model_4(X_blob_test)
+
+# %%
+y_pred_probs = torch.softmax(y_logits, dim=1)
+y_preds = torch.argmax(y_pred_probs, dim=1)
+
+# %%
+plt.figure(figsize=(12, 6))
+plt.subplot(1, 2, 1)
+plt.title("Train")
+plot_decision_boundary(model_4, X_blob_train, y_blob_train)
+plt.subplot(1, 2, 2)
+plt.title("Test")
+plot_decision_boundary(model_4, X_blob_test, y_blob_test)
 # %%
