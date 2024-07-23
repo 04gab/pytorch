@@ -6,7 +6,11 @@ from torchvision import datasets
 from torchvision import transforms
 from torchvision.transforms import ToTensor
 from torch.utils.data import DataLoader
+from timeit import default_timer as timer
+import requests
 import matplotlib.pyplot as plt
+from pathlib import Path
+from helper_functions import accuracy_fn
 print(torch.__version__)
 print(torchvision.__version__)
 # computer vision
@@ -83,6 +87,58 @@ plt.imshow(img.squeeze(), cmap="grey")
 plt.title(class_names[label])
 plt.axis(False)
 print(f"Image size: {img.shape}")
-print(f"Lable: {label}, label size: {label.shape}")
+print(f"Label: {label}, label size: {label.shape}")
+# %%
+flatten_model = nn.Flatten()
+x = train_features_batch[0]
+output = flatten_model(x)
+
+print(f"Shape before flattening: {x.shape}")
+print(f"Shape after flattening: {output.shape}")
 
 # %%
+class FashinMNISTModelV0(nn.Module):
+    def __init__(self,
+                 input_shape: int,
+                 hidden_units: int,
+                 output_shape: int):
+        super().__init__()
+        self.layer_stack = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(in_features=input_shape, 
+                      out_features=hidden_units),
+            nn.Linear(in_features=hidden_units, 
+                      out_features=output_shape)
+        )
+    
+    def forward(self, x):
+        return self.layer_stack(x)
+
+#%%
+model_0 = FashinMNISTModelV0(
+    input_shape=784, #28*28
+    hidden_units=10,
+    output_shape=len(class_names)
+).to("cpu")
+model_0
+# %%
+if Path("helper_functions.py").is_file():
+  print("helper_functions.py already exists, skipping download")
+else:
+  print("Downloading helper_functions.py")
+  request = requests.get("https://raw.githubusercontent.com/mrdbourke/pytorch-deep-learning/main/helper_functions.py")
+  with open("helper_functions.py", "wb") as f:
+    f.write(request.content)
+#%%
+loss_fn = nn.CrossEntropyLoss()
+optimizer = torch.optim.SGD(params=model_0.parameters(),
+                            lr=0.1)
+
+# %%
+def print_train_time(start: float,
+                     end: float,
+                     device: torch.device = None):
+   total_time = end - start
+   print(f"Train time on {device}: {total_time:.3f} seconds")
+   return total_time
+
