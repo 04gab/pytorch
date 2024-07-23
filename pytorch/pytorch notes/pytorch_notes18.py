@@ -1,8 +1,88 @@
+#%%
 import torch 
-import pandas as pd
-import numpy as np
-import timeit
+from torch import nn
+import torchvision
+from torchvision import datasets
+from torchvision import transforms
+from torchvision.transforms import ToTensor
+from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 print(torch.__version__)
-# pytorch and numpy
+print(torchvision.__version__)
+# computer vision
 # ----------------------------------------------------------------------------------------------------------
+# %%
+train_data = datasets.FashionMNIST( #60,000 samples
+    root="data", #where to download data to
+    train=True, #use training set
+    download=True, 
+    transform=torchvision.transforms.ToTensor(), #how do we want to transform data
+    target_transform=None #how do we want to transform labels/targets
+)
+
+test_data = datasets.FashionMNIST( #10,00 samples
+    root="data", 
+    train=False, 
+    download=True, 
+    transform=ToTensor(), 
+    target_transform=None 
+)
+# %%
+len(train_data), len(test_data)
+# %%
+image, label = train_data[0]
+# %%
+class_names = train_data.classes
+class_names
+# %%
+class_to_idx = train_data.class_to_idx
+class_to_idx
+# %%
+print(f"Image shape: {image.shape} -> [color channels, width, height]")
+print(f"Image Label: {class_names[label]}")
+# %%
+#Visualizing data
+plt.imshow(image.squeeze()) #squeeze the dim 
+plt.title(label)
+# %%
+plt.imshow(image.squeeze(), cmap="grey")
+plt.title(class_names[label])
+plt.axis(False)
+# %%
+torch.manual_seed(42)
+fig = plt.figure(figsize=(9, 9))
+rows, cols = 4, 4
+for i in range(1, rows*cols+1):
+    random_idx = torch.randint(0, len(train_data), size=[1]).item()
+    img, label = train_data[random_idx]
+    fig.add_subplot(rows, cols, i)
+    plt.imshow(img.squeeze(), cmap="grey")
+    plt.title(class_names[label])
+    plt.axis(False)
+# %%
+train_data, test_data
+# %%
+BATCH_SIZE = 32
+train_dataloader = DataLoader(dataset=train_data,
+                              batch_size=BATCH_SIZE,
+                              shuffle=True)
+test_dataloader = DataLoader(dataset=test_data,
+                             batch_size=BATCH_SIZE,
+                             shuffle=False)
+# %%
+print(f"DataLoaders: {train_dataloader, test_dataloader}")
+print(f"Lentgh of train_dataloader: {len(train_dataloader)} batches of {BATCH_SIZE}...")
+print(f"Length of test_dataloader: {len(test_dataloader)} batches of {BATCH_SIZE}...")
+#%%
+train_features_batch, train_labels_batch = next(iter(train_dataloader))
+train_features_batch.shape, train_labels_batch.shape
+# %%
+random_idx = torch.randint(0, len(train_features_batch), size=[1]).item()
+img, label = train_features_batch[random_idx], train_labels_batch[random_idx]
+plt.imshow(img.squeeze(), cmap="grey")
+plt.title(class_names[label])
+plt.axis(False)
+print(f"Image size: {img.shape}")
+print(f"Lable: {label}, label size: {label.shape}")
+
+# %%
