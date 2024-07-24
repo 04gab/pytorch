@@ -18,7 +18,7 @@ print(torch.__version__)
 print(torchvision.__version__)
 # computer vision
 # ----------------------------------------------------------------------------------------------------------
-# %%
+#%%
 train_data = datasets.FashionMNIST( #60,000 samples
     root="data", #where to download data to
     train=True, #use training set
@@ -35,15 +35,31 @@ test_data = datasets.FashionMNIST( #10,00 samples
     target_transform=None 
 )
 # %%
-len(train_data), len(test_data)
-# %%
 image, label = train_data[0]
 # %%
 class_names = train_data.classes
-class_names
 # %%
 class_to_idx = train_data.class_to_idx
-class_to_idx
+# %%
+train_data, test_data
+# %%
+BATCH_SIZE = 32
+train_dataloader = DataLoader(dataset=train_data,
+                              batch_size=BATCH_SIZE,
+                              shuffle=True)
+test_dataloader = DataLoader(dataset=test_data,
+                             batch_size=BATCH_SIZE,
+                             shuffle=False)
+#%%
+def print_train_time(start: float,
+                     end: float,
+                     device: torch.device = None):
+   total_time = end - start
+   print(f"Train time on {device}: {total_time:.3f} seconds")
+   return total_time
+#%%
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
 # %%
 print(f"Image shape: {image.shape} -> [color channels, width, height]")
 print(f"Image Label: {class_names[label]}")
@@ -66,16 +82,7 @@ for i in range(1, rows*cols+1):
     plt.imshow(img.squeeze(), cmap="grey")
     plt.title(class_names[label])
     plt.axis(False)
-# %%
-train_data, test_data
-# %%
-BATCH_SIZE = 32
-train_dataloader = DataLoader(dataset=train_data,
-                              batch_size=BATCH_SIZE,
-                              shuffle=True)
-test_dataloader = DataLoader(dataset=test_data,
-                             batch_size=BATCH_SIZE,
-                             shuffle=False)
+
 # %%
 print(f"DataLoaders: {train_dataloader, test_dataloader}")
 print(f"Lentgh of train_dataloader: {len(train_dataloader)} batches of {BATCH_SIZE}...")
