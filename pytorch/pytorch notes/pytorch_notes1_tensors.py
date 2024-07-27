@@ -1,3 +1,4 @@
+#%%
 import torch 
 import pandas as pd
 import numpy as np
@@ -22,3 +23,5 @@ print(matrix.shape)
 tensor = torch.tensor([[[1, 2, 3],
                         [3, 6, 9]]])
 print(tensor.shape)
+
+# %%

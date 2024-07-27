@@ -65,6 +65,7 @@ print(f"Image shape: {image.shape} -> [color channels, width, height]")
 print(f"Image Label: {class_names[label]}")
 # %%
 #Visualizing data
+
 plt.imshow(image.squeeze()) #squeeze the dim 
 plt.title(label)
 # %%
