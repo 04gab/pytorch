@@ -15,12 +15,16 @@ print(x_reshaped)
 z= x.view(1, 10)
 z[:, 0] = 5
 print(z, x)
+#%%
 #stack tensors on top of each other
 x_stacked = torch.stack([x, x, x,], dim=1) # 0 = vertical, 1 = horizontial
 print(x_stacked)
+print(x_stacked.shape)
+#%%
 #squeeze -> removes all single dimension from tensor
 print(x_reshaped.squeeze())
 print(x_reshaped.squeeze().shape)
+#%%
 #unsqueeze -> adds a single dimension to a tensor at a specitif dim
 x_unsqueezed = x.unsqueeze(dim = 0)
 print(x.shape)
